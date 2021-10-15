@@ -11,7 +11,7 @@ from typing import Tuple, List
 
 class LocalSearch:
     def __init__(self):
-        self.current_value[2] = None
+        self.current_values = [-99999, 999999]
 
     def objective_function(self, state: State, n_player: int): #sek ngawur
         # if n_player % 2 == 0: #player1
