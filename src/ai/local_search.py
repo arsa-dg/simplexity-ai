@@ -1,24 +1,20 @@
-import random
+# import random
 import copy
 from time import time
+# from src.model.piece import Piece
+
+from src.ai.objective import objective_function
 
 from src.constant import ShapeConstant
 from src.model import State
 from src.utility import place
 
-from typing import Tuple, List
+from typing import Tuple
 
 
 class LocalSearch:
     def __init__(self):
         self.current_values = [-99999, 999999]
-
-    def objective_function(self, state: State, n_player: int): #sek ngawur
-        # if n_player % 2 == 0: #player1
-            #dibandingkan sebelahnya dengan shape,col player 1
-        # else: #player2
-
-        return 1
 
     def find(self, state: State, n_player: int, thinking_time: float) -> Tuple[str, str]:
         print("find")
@@ -27,7 +23,7 @@ class LocalSearch:
         # itung nilai state skrg
         # harusnya disimpen semua yg dibutuhin di rumus obj function biar cepet
         if (self.current_values[n_player] is None):
-            current_state_value = self.objective_function(state, n_player)
+            current_state_value = objective_function(state, n_player)
         else:
             current_state_value = self.current_values[n_player]
 
@@ -53,7 +49,7 @@ class LocalSearch:
                 print(possible_state.board)
 
                 # cari nilai dari kemungkinan state
-                possible_state_value = self.objective_function(possible_state, n_player)
+                possible_state_value = objective_function(possible_state, n_player)
                 # compare nilai kemungkinan state sama nilai state yg skrg
                 # kalo ada yg sama gapapa
                 # TODO: tentuin yg sama mau diambil lgsg aja atau mau dikumpulin trus dirandom
