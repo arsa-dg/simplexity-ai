@@ -1,7 +1,7 @@
 from src.constant import GameConstant
 from src.model import State
 
-def objective_function(state: State, n_player: int): #sek ngawur
+def heuristic_function(state: State, n_player: int):
         # if n_player % 2 == 0: #player1
             #dibandingkan sebelahnya dengan shape,col player 1
         # else: #player2
@@ -33,3 +33,70 @@ def objective_function(state: State, n_player: int): #sek ngawur
                     else:
                         result -= scores[row][col]
         return result
+
+def get_connect(state: State, n_player:int):
+    if n_player == 0:
+        cur_player_shape = GameConstant.PLAYER1_SHAPE
+        cur_player_color = GameConstant.PLAYER1_COLOR
+    else:
+        cur_player_shape = GameConstant.PLAYER2_SHAPE
+        cur_player_color = GameConstant.PLAYER2_COLOR
+
+    # connect
+    connect_list = []
+    for row in range(state.board.row):
+        for col in range(state.board.col):
+            if (state.board[row,col].color == cur_player_color) or (state.board[row,col].shape == cur_player_shape):
+                for i in range(3):
+                    # Q
+                    if (row+i) < state.board.row and (col-i) >= 0:
+                        if (cur_player_color == state.board[row+i,col-i].color) or (cur_player_shape == state.board[row+i,col-i].shape):
+                            temp = [[row,col],[row+i,col-i]]
+                            connect_list.append(temp)
+                    
+                    # W
+                    if (row+i) < state.board.row:
+                        if (cur_player_color == state.board[row+i,col].color) or (cur_player_shape == state.board[row+i,col].shape):
+                            temp = [[row,col],[row+i,col]]
+                            connect_list.append(temp)
+
+                    # E
+                    if (row+i) < state.board.row and (col+i) < state.board.col:
+                        if (cur_player_color == state.board[row+i,col+i].color) or (cur_player_shape == state.board[row+i,col+i].shape):
+                            temp = [[row,col],[row+i,col+i]]
+                            connect_list.append(temp)
+
+                    # D
+                    if (col+i) < state.board.col:
+                        if (cur_player_color == state.board[row,col+i].color) or (cur_player_shape == state.board[row,col+i].shape):
+                            temp = [[row,col],[row,col+i]]
+                            connect_list.append(temp)
+
+                    # C
+                    if (col+i) < state.board.col and (row-i) >= 0:
+                        if (cur_player_color == state.board[row-i,col+i].color) or (cur_player_shape == state.board[row-i,col+i].shape):
+                            temp = [[row,col],[row-i,col+i]]
+                            connect_list.append(temp)
+                    
+                    # X
+                    if (row-i) >= 0:
+                        if (cur_player_color == state.board[row-i,col].color) or (cur_player_shape == state.board[row-i,col].shape):
+                            temp = [[row,col],[row-i,col]]
+                            connect_list.append(temp)
+
+                    # Z
+                    if (row-i) >= 0 and (col-i) >= 0:
+                        if (cur_player_color == state.board[row-i,col-i].color) or (cur_player_shape == state.board[row-i,col-i].shape):
+                            temp = [[row,col],[row-i,col-i]]
+                            connect_list.append(temp)
+                    
+                    # A
+                    if (col-i) >= 0:
+                        if (cur_player_color == state.board[row,col-i].color) or (cur_player_shape == state.board[row,col-i].shape):
+                            temp = [[row,col],[row,col-i]]
+                            connect_list.append(temp)
+
+    return len(connect_list)
+
+def objective_function(state: State, n_player: int):
+    return heuristic_function(state, n_player) + get_connect(state, n_player)
