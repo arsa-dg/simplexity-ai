@@ -99,4 +99,7 @@ def get_connect(state: State, n_player:int):
     return len(connect_list)
 
 def objective_function(state: State, n_player: int):
-    return heuristic_function(state, n_player) + get_connect(state, n_player)
+    if (n_player == 0):
+        return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1)
+    else:
+        return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0)
