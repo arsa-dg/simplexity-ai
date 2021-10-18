@@ -14,7 +14,7 @@ from typing import Tuple
 
 class LocalSearch:
     def __init__(self):
-        self.current_values = [-99999, 999999]
+        self.current_values = [-99999, -999999]
 
     def find(self, state: State, n_player: int, thinking_time: float) -> Tuple[str, str]:
         print("find")
@@ -50,6 +50,7 @@ class LocalSearch:
 
                 # cari nilai dari kemungkinan state
                 possible_state_value = objective_function(possible_state, n_player)
+                print("value", possible_state_value)
                 # compare nilai kemungkinan state sama nilai state yg skrg
                 # kalo ada yg sama gapapa
                 # TODO: tentuin yg sama mau diambil lgsg aja atau mau dikumpulin trus dirandom

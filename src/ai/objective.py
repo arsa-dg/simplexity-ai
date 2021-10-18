@@ -22,7 +22,7 @@ def heuristic_function(state: State, n_player: int):
                     piece = state.board[row, col]
                     if(piece.color == GameConstant.PLAYER1_COLOR):
                         result += scores[row][col]
-                    else:
+                    elif(piece.color == GameConstant.PLAYER2_COLOR):
                         result -= scores[row][col]
         else:
             for row in range(state.board.row):
@@ -30,11 +30,13 @@ def heuristic_function(state: State, n_player: int):
                     piece = state.board[row, col]
                     if(piece.color == GameConstant.PLAYER2_COLOR):
                         result += scores[row][col]
-                    else:
+                    elif(piece.color == GameConstant.PLAYER1_COLOR):
                         result -= scores[row][col]
+        print("result heu", result)
         return result
 
 def get_connect(state: State, n_player:int):
+    print("player" , n_player)
     if n_player == 0:
         cur_player_shape = GameConstant.PLAYER1_SHAPE
         cur_player_color = GameConstant.PLAYER1_COLOR
@@ -100,6 +102,8 @@ def get_connect(state: State, n_player:int):
 
 def objective_function(state: State, n_player: int):
     if (n_player == 0):
+        print("obj player 1",heuristic_function(state, n_player) , get_connect(state, n_player) ,get_connect(state, 1))
         return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1)
     else:
+        print("obj player 2", heuristic_function(state, n_player) , get_connect(state, n_player) , get_connect(state, 0))
         return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0)
