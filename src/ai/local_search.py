@@ -1,7 +1,6 @@
-# import random
+import random
 import copy
 from time import time
-# from src.model.piece import Piece
 
 from src.ai.objective import objective_function
 
@@ -14,55 +13,57 @@ from typing import Tuple
 
 class LocalSearch:
     def __init__(self):
-        self.current_values = [-99999, -999999]
+        pass
 
     def find(self, state: State, n_player: int, thinking_time: float) -> Tuple[str, str]:
-        print("find")
         self.thinking_time = time() + thinking_time
-        self.temp_state = state
-        # itung nilai state skrg
-        # harusnya disimpen semua yg dibutuhin di rumus obj function biar cepet
-        if (self.current_values[n_player] is None):
-            current_state_value = objective_function(state, n_player)
-        else:
-            current_state_value = self.current_values[n_player]
+        current_state_value = objective_function(state, n_player)
 
-        best_state = state
         best_state_value = current_state_value
-        best_col = -1
+        best_col = 0
         best_shape = ShapeConstant.CROSS
+
+        equal_state_value = current_state_value
+        equal_best_placements = []
         
         # iterasi semua kemungkinan
         for col in range(state.board.col):
+            remaining_time = self.thinking_time - time()
+            
+            if remaining_time < 0.00005:
+                break
+        
             for shape in [ShapeConstant.CROSS, ShapeConstant.CIRCLE]: #sek ngawur
                 # ambil state lama buat dicoba2
+                if remaining_time < 0.00005:
+                    break
+
                 possible_state = copy.deepcopy(state)
-                print("col = ", col)
-                print("shape = ", shape)
+                shape_quota = possible_state.players[n_player].quota
+
+                if shape_quota.get(shape) == 0:
+                    continue
+
                 possible_placement = place(possible_state, n_player, shape, col)
 
                 # peletakan ga valid, coba kemungkinan lain
                 if possible_placement == -1:
                     continue
 
-                print("possible board\n")
-                print(possible_state.board)
-
                 # cari nilai dari kemungkinan state
                 possible_state_value = objective_function(possible_state, n_player)
-                print("value", possible_state_value)
-                # compare nilai kemungkinan state sama nilai state yg skrg
-                # kalo ada yg sama gapapa
-                # TODO: tentuin yg sama mau diambil lgsg aja atau mau dikumpulin trus dirandom
-                if (best_state_value <= possible_state_value):
-                    best_state = possible_state
+                if (best_state_value < possible_state_value):
                     best_state_value = possible_state_value
                     best_col = col
                     best_shape = shape
-    
-        # simpan value buat referensi turn selanjutnya
-        self.current_values[n_player] = best_state_value
+                    equal_best_placements = []
+                    equal_best_placements.append([best_col, best_shape])
+                elif (best_state_value == possible_state_value):
+                    equal_best_placements.append([col, shape])
 
+        if len(equal_best_placements) > 1:
+            best_col, best_shape = random.choice(equal_best_placements)
+            
         best_movement = (best_col, best_shape) 
 
         return best_movement
