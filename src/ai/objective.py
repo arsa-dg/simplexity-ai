@@ -40,65 +40,195 @@ def get_connect(state: State, n_player:int):
     if n_player == 0:
         cur_player_shape = GameConstant.PLAYER1_SHAPE
         cur_player_color = GameConstant.PLAYER1_COLOR
+        cur_opponent_shape = GameConstant.PLAYER2_SHAPE
+        cur_opponent_color = GameConstant.PLAYER2_COLOR
     else:
         cur_player_shape = GameConstant.PLAYER2_SHAPE
         cur_player_color = GameConstant.PLAYER2_COLOR
+        cur_opponent_shape = GameConstant.PLAYER1_SHAPE
+        cur_opponent_color = GameConstant.PLAYER1_COLOR
 
     # connect
-    connect_list = []
+    connect_list_cell = [[0 for x in range(3)] for direction in range(8)] # QWEDCXZA[3]
+
+    toReturn = 0
+
     for row in range(state.board.row):
         for col in range(state.board.col):
-            if (state.board[row,col].color == cur_player_color) or (state.board[row,col].shape == cur_player_shape):
-                for i in range(3):
+            if (state.board[row,col].color == cur_player_color):
+                for i in range(1,4):
                     # Q
-                    if (row+i) < state.board.row and (col-i) >= 0:
-                        if (cur_player_color == state.board[row+i,col-i].color) or (cur_player_shape == state.board[row+i,col-i].shape):
-                            temp = [[row,col],[row+i,col-i]]
-                            connect_list.append(temp)
+                    if ((row+i) < state.board.row) and ((col-i) >= 0):
+                        if (cur_opponent_shape == state.board[row+i,col-i].shape) or (cur_opponent_color == state.board[row+i,col-i].color):
+                            if (cur_opponent_shape == state.board[row+i,col-i].shape) and (cur_opponent_color == state.board[row+i,col-i].color):
+                                connect_list_cell[0] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row+i,col-i].shape) and (cur_opponent_color == state.board[row+i,col-i].color):
+                                for x in connect_list_cell[0]:
+                                    if (x == 1):
+                                        connect_list_cell[0] = [0 for x in range(3)]
+                        
+                        if (i == 1) or (connect_list_cell[0][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col-i].shape):
+                                connect_list_cell[0][i-1] = 2
+                            elif state.board[row,col].color == state.board[row+i,col-i].color:
+                                connect_list_cell[0][i-1] = 1
+
+                    else:
+                        connect_list_cell[0] = [0 for x in range(3)]
                     
                     # W
                     if (row+i) < state.board.row:
-                        if (cur_player_color == state.board[row+i,col].color) or (cur_player_shape == state.board[row+i,col].shape):
-                            temp = [[row,col],[row+i,col]]
-                            connect_list.append(temp)
+                        if (cur_opponent_shape == state.board[row+i,col].shape) or (cur_opponent_color == state.board[row+i,col].color):
+                            if (cur_opponent_shape == state.board[row+i,col].shape) and (cur_opponent_color == state.board[row+i,col].color):
+                                connect_list_cell[1] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row+i,col].shape) and (cur_opponent_color == state.board[row+i,col].color):
+                                for x in connect_list_cell[1]:
+                                    if (x == 1):
+                                        connect_list_cell[1] = [0 for x in range(3)]
+                        
+                        if (i == 1) or (connect_list_cell[1][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col].shape):
+                                connect_list_cell[1][i-1] = 2
+                            elif state.board[row,col].color == state.board[row+i,col].color:
+                                connect_list_cell[1][i-1] = 1
+
+
+                    else:
+                        connect_list_cell[1] = [0 for x in range(3)]
 
                     # E
-                    if (row+i) < state.board.row and (col+i) < state.board.col:
-                        if (cur_player_color == state.board[row+i,col+i].color) or (cur_player_shape == state.board[row+i,col+i].shape):
-                            temp = [[row,col],[row+i,col+i]]
-                            connect_list.append(temp)
+                    if ((row+i) < state.board.row) and ((col+i) < state.board.col):
+                        if (cur_opponent_shape == state.board[row+i,col+i].shape) or (cur_opponent_color == state.board[row+i,col+i].color):
+                            if (cur_opponent_shape == state.board[row+i,col+i].shape) and (cur_opponent_color == state.board[row+i,col+i].color):
+                                connect_list_cell[2] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row+i,col+i].shape) and (cur_opponent_color == state.board[row+i,col+i].color):
+                                for x in connect_list_cell[2]:
+                                    if (x == 1):
+                                        connect_list_cell[2] = [0 for x in range(3)]
+                        
+                        if (i == 1) or (connect_list_cell[2][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col+i].shape):
+                                connect_list_cell[2][i-1] = 2
+                            elif state.board[row,col].color == state.board[row+i,col+i].color:
+                                connect_list_cell[2][i-1] = 1
+
+                    else:
+                        connect_list_cell[2] = [0 for x in range(3)]
 
                     # D
                     if (col+i) < state.board.col:
-                        if (cur_player_color == state.board[row,col+i].color) or (cur_player_shape == state.board[row,col+i].shape):
-                            temp = [[row,col],[row,col+i]]
-                            connect_list.append(temp)
+                        if (cur_opponent_shape == state.board[row,col+i].shape) or (cur_opponent_color == state.board[row,col+i].color):
+                            if (cur_opponent_shape == state.board[row,col+i].shape) and (cur_opponent_color == state.board[row,col+i].color):
+                                connect_list_cell[3] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row,col+i].shape) and (cur_opponent_color == state.board[row,col+i].color):
+                                for x in connect_list_cell[3]:
+                                    if (x == 1):
+                                        connect_list_cell[3] = [0 for x in range(3)]
+
+                        if (i == 1) or (connect_list_cell[3][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row,col+i].shape):
+                                connect_list_cell[3][i-1] = 2
+                            elif state.board[row,col].color == state.board[row,col+i].color:
+                                connect_list_cell[3][i-1] = 1
+
+                    else:
+                        connect_list_cell[3] = [0 for x in range(3)]
 
                     # C
-                    if (col+i) < state.board.col and (row-i) >= 0:
-                        if (cur_player_color == state.board[row-i,col+i].color) or (cur_player_shape == state.board[row-i,col+i].shape):
-                            temp = [[row,col],[row-i,col+i]]
-                            connect_list.append(temp)
+                    if ((col+i) < state.board.col) and ((row-i) >= 0):
+                        if (cur_opponent_shape == state.board[row-i,col+i].shape) or (cur_opponent_color == state.board[row-i,col+i].color):
+                            if (cur_opponent_shape == state.board[row-i,col+i].shape) and (cur_opponent_color == state.board[row-i,col+i].color):
+                                connect_list_cell[4] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row-i,col+i].shape) and (cur_opponent_color == state.board[row-i,col+i].color):
+                                for x in connect_list_cell[4]:
+                                    if (x == 1):
+                                        connect_list_cell[4] = [0 for x in range(3)]
+
+                        if (i == 1) or (connect_list_cell[4][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row-i,col+i].shape):
+                                connect_list_cell[4][i-1] = 2
+                            elif state.board[row,col].color == state.board[row-i,col+i].color:
+                                connect_list_cell[4][i-1] = 1
+
+                    else:
+                        connect_list_cell[4] = [0 for x in range(3)]
                     
                     # X
                     if (row-i) >= 0:
-                        if (cur_player_color == state.board[row-i,col].color) or (cur_player_shape == state.board[row-i,col].shape):
-                            temp = [[row,col],[row-i,col]]
-                            connect_list.append(temp)
+                        if (cur_opponent_shape == state.board[row-i,col].shape) or (cur_opponent_color == state.board[row-i,col].color):
+                            if (cur_opponent_shape == state.board[row-i,col].shape) and (cur_opponent_color == state.board[row-i,col].color):
+                                connect_list_cell[5] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row-i,col].shape) and (cur_opponent_color == state.board[row-i,col].color):
+                                for x in connect_list_cell[5]:
+                                    if (x == 1):
+                                        connect_list_cell[5] = [0 for x in range(3)]
+
+                        if (i == 1) or (connect_list_cell[5][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row-i,col].shape):
+                                connect_list_cell[5][i-1] = 2
+                            elif state.board[row,col].color == state.board[row-i,col].color:
+                                connect_list_cell[5][i-1] = 1
+
+                    else:
+                        connect_list_cell[5] = [0 for x in range(3)]
 
                     # Z
-                    if (row-i) >= 0 and (col-i) >= 0:
-                        if (cur_player_color == state.board[row-i,col-i].color) or (cur_player_shape == state.board[row-i,col-i].shape):
-                            temp = [[row,col],[row-i,col-i]]
-                            connect_list.append(temp)
+                    if ((row-i) >= 0) and ((col-i) >= 0):
+                        if (cur_opponent_shape == state.board[row-i,col-i].shape) or (cur_opponent_color == state.board[row-i,col-i].color):
+                            if (cur_opponent_shape == state.board[row-i,col-i].shape) and (cur_opponent_color == state.board[row-i,col-i].color):
+                                connect_list_cell[6] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row-i,col-i].shape) and (cur_opponent_color == state.board[row-i,col-i].color):
+                                for x in connect_list_cell[6]:
+                                    if (x == 1):
+                                        connect_list_cell[6] = [0 for x in range(3)]
+                        
+                        if (i == 1) or (connect_list_cell[6][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row-i,col-i].shape):
+                                connect_list_cell[6][i-1] = 2
+                            elif state.board[row,col].color == state.board[row-i,col-i].color:
+                                connect_list_cell[6][i-1] = 1
+
+                    else:
+                        connect_list_cell[6] = [0 for x in range(3)]
                     
                     # A
                     if (col-i) >= 0:
-                        if (cur_player_color == state.board[row,col-i].color) or (cur_player_shape == state.board[row,col-i].shape):
-                            temp = [[row,col],[row,col-i]]
-                            connect_list.append(temp)
+                        if (cur_opponent_shape == state.board[row,col-i].shape) or (cur_opponent_color == state.board[row,col-i].color):
+                            if (cur_opponent_shape == state.board[row,col-i].shape) and (cur_opponent_color == state.board[row,col-i].color):
+                                connect_list_cell[7] = [0 for x in range(3)]
+                            elif (cur_opponent_shape != state.board[row,col-i].shape) and (cur_opponent_color == state.board[row,col-i].color):
+                                for x in connect_list_cell[7]:
+                                    if (x == 1):
+                                        connect_list_cell[7] = [0 for x in range(3)]
+                        
+                        if (i == 1) or (connect_list_cell[7][i-2] != 0):
+                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row,col-i].shape):
+                                connect_list_cell[7][i-1] = 2
+                            elif state.board[row,col].color == state.board[row,col-i].color:
+                                connect_list_cell[7][i-1] = 1
 
-    return len(connect_list)
+                    else:
+                        connect_list_cell[7] = [0 for x in range(3)]
+                
+                print(row,col,connect_list_cell)
+                for x in connect_list_cell:
+                    connect_4_shape = True
+                    connect_4_color = True
+                    for y in x:
+                        toReturn += y
+                        if y != 2:
+                            connect_4_shape = False
+                        if y == 0:
+                            connect_4_color = False
+
+                    if connect_4_shape:
+                        return 99
+                    elif connect_4_color:
+                        return 49
+
+                connect_list_cell = [[0 for x in range(3)] for direction in range(8)]
+
+    return toReturn
 
 def objective_function(state: State, n_player: int):
     if (n_player == 0):
