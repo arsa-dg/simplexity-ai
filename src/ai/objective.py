@@ -56,7 +56,9 @@ def get_connect(state: State, n_player:int):
             if (state.board[row,col].color == cur_player_color):
                 for i in range(1,4):
                     # Q
+                    # Cek satu cell di atas
                     if ((row+i) < state.board.row) and ((col-i) >= 0):
+                        # Cek pion sama dengan color/shape musuh -> poin = 0
                         if (cur_opponent_shape == state.board[row+i,col-i].shape) or (cur_opponent_color == state.board[row+i,col-i].color):
                             if (cur_opponent_shape == state.board[row+i,col-i].shape) and (cur_opponent_color == state.board[row+i,col-i].color):
                                 connect_list_cell[0] = [0 for x in range(3)]
@@ -65,6 +67,7 @@ def get_connect(state: State, n_player:int):
                                     if (x == 1):
                                         connect_list_cell[0] = [0 for x in range(3)]
                         
+                        # Hitung poin connect
                         if (i == 1) or (connect_list_cell[0][i-2] != 0):
                             if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col-i].shape):
                                 connect_list_cell[0][i-1] = 2
@@ -227,10 +230,18 @@ def get_connect(state: State, n_player:int):
 
     return toReturn
 
-def objective_function(state: State, n_player: int):
+def objective_function(state: State, n_player: int, chosen_shape: str = "-"):
     if (n_player == 0):
-        print("obj player 1",heuristic_function(state, n_player) , get_connect(state, n_player) ,get_connect(state, 1))
-        return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1)
+        if(chosen_shape == GameConstant.PLAYER1_SHAPE):
+            return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1) + 2
+        elif(chosen_shape == GameConstant.PLAYER2_SHAPE):
+            return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1) + 1
+        else:
+            return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1)
     else:
-        print("obj player 2", heuristic_function(state, n_player) , get_connect(state, n_player) , get_connect(state, 0))
-        return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0)
+        if(chosen_shape == GameConstant.PLAYER2_SHAPE):
+            return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0) + 2
+        elif(chosen_shape == GameConstant.PLAYER1_SHAPE):
+            return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0) + 1
+        else:
+            return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0)

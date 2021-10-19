@@ -17,7 +17,7 @@ class LocalSearch:
 
     def find(self, state: State, n_player: int, thinking_time: float) -> Tuple[str, str]:
         self.thinking_time = time() + thinking_time
-        current_state_value = objective_function(state, n_player)
+        current_state_value = objective_function(state, n_player, "-")
 
         best_state_value = current_state_value
         best_col = 0
@@ -51,7 +51,7 @@ class LocalSearch:
                     continue
 
                 # cari nilai dari kemungkinan state
-                possible_state_value = objective_function(possible_state, n_player)
+                possible_state_value = objective_function(possible_state, n_player, shape)
                 if (best_state_value < possible_state_value):
                     best_state_value = possible_state_value
                     best_col = col
