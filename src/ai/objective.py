@@ -34,7 +34,20 @@ def heuristic_function(state: State, n_player: int):
                         result -= scores[row][col]
         return result
 
-def get_connect(state: State, n_player:int):
+def get_connect(state: State, n_player: int):
+    def check_direction(cur_shape, cur_color, cur_opponent_color, row, col):
+        if state.board[row,col].color == cur_color:
+            if state.board[row,col].shape == cur_shape:
+                return 2
+            return 1
+        
+        elif state.board[row,col].color == cur_opponent_color:
+            if state.board[row,col].shape == cur_shape:
+                return -1
+            return -2
+        
+        return 0 
+    
     if n_player == 0:
         cur_player_shape = GameConstant.PLAYER1_SHAPE
         cur_player_color = GameConstant.PLAYER1_COLOR
@@ -46,192 +59,111 @@ def get_connect(state: State, n_player:int):
         cur_opponent_shape = GameConstant.PLAYER1_SHAPE
         cur_opponent_color = GameConstant.PLAYER1_COLOR
 
-    # connect
-    connect_list_cell = [[0 for x in range(3)] for direction in range(8)] # QWEDCXZA[3]
+    to_return = 0
 
-    toReturn = 0
+    connect_cell = [[0 for plus in range(3)] for direction in range(8)] # QWEDCXZA[3]
 
     for row in range(state.board.row):
         for col in range(state.board.col):
-            if (state.board[row,col].color == cur_player_color):
-                for i in range(1,4):
+            if state.board[row,col].color == cur_player_color:
+                for plus in range(1,4):
+                    # Cek cell + plus
                     # Q
-                    # Cek satu cell di atas
-                    if ((row+i) < state.board.row) and ((col-i) >= 0):
-                        # Cek pion sama dengan color/shape musuh -> poin = 0
-                        if (cur_opponent_shape == state.board[row+i,col-i].shape) or (cur_opponent_color == state.board[row+i,col-i].color):
-                            if (cur_opponent_shape == state.board[row+i,col-i].shape) and (cur_opponent_color == state.board[row+i,col-i].color):
-                                connect_list_cell[0] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row+i,col-i].shape) and (cur_opponent_color == state.board[row+i,col-i].color):
-                                for x in connect_list_cell[0]:
-                                    if (x == 1):
-                                        connect_list_cell[0] = [0 for x in range(3)]
-                        
-                        # Hitung poin connect
-                        if (i == 1) or (connect_list_cell[0][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col-i].shape):
-                                connect_list_cell[0][i-1] = 2
-                            elif state.board[row,col].color == state.board[row+i,col-i].color:
-                                connect_list_cell[0][i-1] = 1
-
+                    if ((row+plus) < state.board.row) and ((col-plus) >= 0):
+                        connect_cell[0][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row+plus, col-plus)
                     else:
-                        connect_list_cell[0] = [0 for x in range(3)]
-                    
+                        connect_cell[0] = [0 for plus in range(3)]
                     # W
-                    if (row+i) < state.board.row:
-                        if (cur_opponent_shape == state.board[row+i,col].shape) or (cur_opponent_color == state.board[row+i,col].color):
-                            if (cur_opponent_shape == state.board[row+i,col].shape) and (cur_opponent_color == state.board[row+i,col].color):
-                                connect_list_cell[1] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row+i,col].shape) and (cur_opponent_color == state.board[row+i,col].color):
-                                for x in connect_list_cell[1]:
-                                    if (x == 1):
-                                        connect_list_cell[1] = [0 for x in range(3)]
-                        
-                        if (i == 1) or (connect_list_cell[1][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col].shape):
-                                connect_list_cell[1][i-1] = 2
-                            elif state.board[row,col].color == state.board[row+i,col].color:
-                                connect_list_cell[1][i-1] = 1
-
-
+                    if (row+plus) < state.board.row:
+                        connect_cell[1][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row+plus, col)
                     else:
-                        connect_list_cell[1] = [0 for x in range(3)]
-
+                        connect_cell[1] = [0 for plus in range(3)]
                     # E
-                    if ((row+i) < state.board.row) and ((col+i) < state.board.col):
-                        if (cur_opponent_shape == state.board[row+i,col+i].shape) or (cur_opponent_color == state.board[row+i,col+i].color):
-                            if (cur_opponent_shape == state.board[row+i,col+i].shape) and (cur_opponent_color == state.board[row+i,col+i].color):
-                                connect_list_cell[2] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row+i,col+i].shape) and (cur_opponent_color == state.board[row+i,col+i].color):
-                                for x in connect_list_cell[2]:
-                                    if (x == 1):
-                                        connect_list_cell[2] = [0 for x in range(3)]
-                        
-                        if (i == 1) or (connect_list_cell[2][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row+i,col+i].shape):
-                                connect_list_cell[2][i-1] = 2
-                            elif state.board[row,col].color == state.board[row+i,col+i].color:
-                                connect_list_cell[2][i-1] = 1
-
+                    if ((row+plus) < state.board.row) and ((col+plus) <state.board.col):
+                        connect_cell[2][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row+plus, col+plus)
                     else:
-                        connect_list_cell[2] = [0 for x in range(3)]
-
+                        connect_cell[2] = [0 for plus in range(3)]
                     # D
-                    if (col+i) < state.board.col:
-                        if (cur_opponent_shape == state.board[row,col+i].shape) or (cur_opponent_color == state.board[row,col+i].color):
-                            if (cur_opponent_shape == state.board[row,col+i].shape) and (cur_opponent_color == state.board[row,col+i].color):
-                                connect_list_cell[3] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row,col+i].shape) and (cur_opponent_color == state.board[row,col+i].color):
-                                for x in connect_list_cell[3]:
-                                    if (x == 1):
-                                        connect_list_cell[3] = [0 for x in range(3)]
-
-                        if (i == 1) or (connect_list_cell[3][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row,col+i].shape):
-                                connect_list_cell[3][i-1] = 2
-                            elif state.board[row,col].color == state.board[row,col+i].color:
-                                connect_list_cell[3][i-1] = 1
-
+                    if (col+plus) < state.board.col:
+                        connect_cell[3][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row, col+plus)
                     else:
-                        connect_list_cell[3] = [0 for x in range(3)]
-
+                        connect_cell[3] = [0 for plus in range(3)]
                     # C
-                    if ((col+i) < state.board.col) and ((row-i) >= 0):
-                        if (cur_opponent_shape == state.board[row-i,col+i].shape) or (cur_opponent_color == state.board[row-i,col+i].color):
-                            if (cur_opponent_shape == state.board[row-i,col+i].shape) and (cur_opponent_color == state.board[row-i,col+i].color):
-                                connect_list_cell[4] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row-i,col+i].shape) and (cur_opponent_color == state.board[row-i,col+i].color):
-                                for x in connect_list_cell[4]:
-                                    if (x == 1):
-                                        connect_list_cell[4] = [0 for x in range(3)]
-
-                        if (i == 1) or (connect_list_cell[4][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row-i,col+i].shape):
-                                connect_list_cell[4][i-1] = 2
-                            elif state.board[row,col].color == state.board[row-i,col+i].color:
-                                connect_list_cell[4][i-1] = 1
-
+                    if ((row-plus) >= 0) and ((col+plus) < state.board.col):
+                        connect_cell[4][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row-plus, col+plus)
                     else:
-                        connect_list_cell[4] = [0 for x in range(3)]
-                    
+                        connect_cell[4] = [0 for plus in range(3)]
                     # X
-                    if (row-i) >= 0:
-                        if (cur_opponent_shape == state.board[row-i,col].shape) or (cur_opponent_color == state.board[row-i,col].color):
-                            if (cur_opponent_shape == state.board[row-i,col].shape) and (cur_opponent_color == state.board[row-i,col].color):
-                                connect_list_cell[5] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row-i,col].shape) and (cur_opponent_color == state.board[row-i,col].color):
-                                for x in connect_list_cell[5]:
-                                    if (x == 1):
-                                        connect_list_cell[5] = [0 for x in range(3)]
-
-                        if (i == 1) or (connect_list_cell[5][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row-i,col].shape):
-                                connect_list_cell[5][i-1] = 2
-                            elif state.board[row,col].color == state.board[row-i,col].color:
-                                connect_list_cell[5][i-1] = 1
-
+                    if (row-plus) >= 0:
+                        connect_cell[5][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row-plus, col)
                     else:
-                        connect_list_cell[5] = [0 for x in range(3)]
-
+                        connect_cell[5] = [0 for plus in range(3)]
                     # Z
-                    if ((row-i) >= 0) and ((col-i) >= 0):
-                        if (cur_opponent_shape == state.board[row-i,col-i].shape) or (cur_opponent_color == state.board[row-i,col-i].color):
-                            if (cur_opponent_shape == state.board[row-i,col-i].shape) and (cur_opponent_color == state.board[row-i,col-i].color):
-                                connect_list_cell[6] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row-i,col-i].shape) and (cur_opponent_color == state.board[row-i,col-i].color):
-                                for x in connect_list_cell[6]:
-                                    if (x == 1):
-                                        connect_list_cell[6] = [0 for x in range(3)]
-                        
-                        if (i == 1) or (connect_list_cell[6][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row-i,col-i].shape):
-                                connect_list_cell[6][i-1] = 2
-                            elif state.board[row,col].color == state.board[row-i,col-i].color:
-                                connect_list_cell[6][i-1] = 1
-
+                    if ((row-plus) >= 0) and ((col-plus) >= 0):
+                        connect_cell[6][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row-plus, col-plus)
                     else:
-                        connect_list_cell[6] = [0 for x in range(3)]
-                    
+                        connect_cell[6] = [0 for plus in range(3)]
                     # A
-                    if (col-i) >= 0:
-                        if (cur_opponent_shape == state.board[row,col-i].shape) or (cur_opponent_color == state.board[row,col-i].color):
-                            if (cur_opponent_shape == state.board[row,col-i].shape) and (cur_opponent_color == state.board[row,col-i].color):
-                                connect_list_cell[7] = [0 for x in range(3)]
-                            elif (cur_opponent_shape != state.board[row,col-i].shape) and (cur_opponent_color == state.board[row,col-i].color):
-                                for x in connect_list_cell[7]:
-                                    if (x == 1):
-                                        connect_list_cell[7] = [0 for x in range(3)]
-                        
-                        if (i == 1) or (connect_list_cell[7][i-2] != 0):
-                            if (cur_player_shape == state.board[row,col].shape) and (state.board[row,col].shape == state.board[row,col-i].shape):
-                                connect_list_cell[7][i-1] = 2
-                            elif state.board[row,col].color == state.board[row,col-i].color:
-                                connect_list_cell[7][i-1] = 1
-
+                    if (col-plus) >= 0:
+                        connect_cell[7][plus-1] = check_direction(cur_player_shape, cur_player_color, cur_opponent_color, row, col-plus)
                     else:
-                        connect_list_cell[7] = [0 for x in range(3)]
+                        connect_cell[7] = [0 for plus in range(3)]
                 
-                for x in connect_list_cell:
-                    connect_4_shape = True
-                    connect_4_color = True
-                    for y in x:
-                        toReturn += y
-                        if y != 2:
-                            connect_4_shape = False
-                        if y == 0:
-                            connect_4_color = False
+                # print(row,col,connect_cell) # bentaran
+                # Hitung connect
+                for direction in range(8):
+                    temp = 0
+                    is_connect_4_shape = True
+                    is_connect_4_color = True
+                    is_blocking = True
 
-                    if connect_4_shape:
-                        return 99
-                    elif connect_4_color:
-                        return 49
+                    for plus in range(3):
+                        if connect_cell[direction][plus] >= 0:
+                            is_blocking = False
 
-                connect_list_cell = [[0 for x in range(3)] for direction in range(8)]
+                            if (plus == 0) or (temp != 0):
+                                if connect_cell[direction][plus] == 1:
+                                    is_connect_4_shape = False
+                                    temp += connect_cell[direction][plus]
 
-    return toReturn
+                                elif connect_cell[direction][plus] == 2:
+                                    if temp == (2*plus):
+                                        temp += connect_cell[direction][plus]
+                                    else:
+                                        temp += 1
+                                
+                                else:
+                                    is_connect_4_shape = False
+                                    is_connect_4_color = False
+                        
+                        else:
+                            is_connect_4_color = False
+
+                            if connect_cell[direction][plus] == -2:
+                                is_connect_4_shape = False
+                                temp = 0
+                            else:
+                                if temp == (2*plus):
+                                    temp += 2
+                                else:
+                                    temp = 0
+                    
+                    to_return += temp
+                    if is_connect_4_shape:
+                        to_return += 99
+                    if is_connect_4_color:
+                        to_return += 79
+                    if is_blocking:
+                        to_return += 49
+
+                # reset connect_cell
+                connect_cell = [[0 for plus in range(3)] for direction in range(8)]
+
+    return to_return
 
 def objective_function(state: State, n_player: int, chosen_shape: str = "-"):
     if (n_player == 0):
+        # print(heuristic_function(state, n_player), get_connect(state, n_player), get_connect(state, 1))
         if(chosen_shape == GameConstant.PLAYER1_SHAPE):
             return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1) + 2
         elif(chosen_shape == GameConstant.PLAYER2_SHAPE):
@@ -239,6 +171,7 @@ def objective_function(state: State, n_player: int, chosen_shape: str = "-"):
         else:
             return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 1)
     else:
+        # print(heuristic_function(state, n_player), get_connect(state, n_player), get_connect(state, 0))
         if(chosen_shape == GameConstant.PLAYER2_SHAPE):
             return heuristic_function(state, n_player) + get_connect(state, n_player) - get_connect(state, 0) + 2
         elif(chosen_shape == GameConstant.PLAYER1_SHAPE):

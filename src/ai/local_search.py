@@ -50,8 +50,13 @@ class LocalSearch:
                 if possible_placement == -1:
                     continue
 
+                # kalo mau ngecek ilangin komen printnya
+                # print(possible_state.board)
+
                 # cari nilai dari kemungkinan state
+                # print('current value', current_state_value)
                 possible_state_value = objective_function(possible_state, n_player, shape)
+                # print(possible_state_value)
                 if (best_state_value < possible_state_value):
                     best_state_value = possible_state_value
                     best_col = col
