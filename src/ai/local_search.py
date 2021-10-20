@@ -20,8 +20,8 @@ class LocalSearch:
         current_state_value = objective_function(state, n_player, "-")
 
         best_state_value = current_state_value
-        best_col = 0
-        best_shape = ShapeConstant.CROSS
+        best_col = None
+        best_shape = None
 
         equal_state_value = current_state_value
         equal_best_placements = []
@@ -67,8 +67,13 @@ class LocalSearch:
                     equal_best_placements.append([col, shape])
 
         if len(equal_best_placements) > 1:
+            print('RANDOM GARA2 ADA YG SAMA\n')
             best_col, best_shape = random.choice(equal_best_placements)
+
+        if best_col == None and best_shape == None:
+            print('RANDOM GARA2 NONE\n')
+            best_col, best_shape = (random.randint(0, state.board.col), random.choice([ShapeConstant.CROSS, ShapeConstant.CIRCLE]))
             
         best_movement = (best_col, best_shape) 
-
+        print(best_movement)
         return best_movement
